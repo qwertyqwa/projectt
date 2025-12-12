@@ -1,8 +1,9 @@
 import math
+from decimal import Decimal
 
 from rest_framework import serializers
 
-from .models import Product, ProductWorkshop
+from .models import MaterialType, Product, ProductType, ProductWorkshop
 
 
 def rounded_hours(raw_value: float | None) -> int:
@@ -14,7 +15,9 @@ def rounded_hours(raw_value: float | None) -> int:
 
 class ProductListSerializer(serializers.ModelSerializer):
     product_type = serializers.CharField(source="product_type.name")
+    product_type_id = serializers.IntegerField(source="product_type.id")
     material_type = serializers.CharField(source="material_type.name")
+    material_type_id = serializers.IntegerField(source="material_type.id")
     manufacture_time_hours = serializers.SerializerMethodField()
 
     class Meta:
@@ -25,7 +28,9 @@ class ProductListSerializer(serializers.ModelSerializer):
             "article",
             "min_partner_price",
             "product_type",
+            "product_type_id",
             "material_type",
+            "material_type_id",
             "manufacture_time_hours",
         ]
 
@@ -50,3 +55,44 @@ class ProductDetailSerializer(ProductListSerializer):
 
     class Meta(ProductListSerializer.Meta):
         fields = ProductListSerializer.Meta.fields + ["workshops"]
+
+
+class ProductTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductType
+        fields = ["id", "name"]
+
+
+class MaterialTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MaterialType
+        fields = ["id", "name"]
+
+
+class ProductWriteSerializer(serializers.ModelSerializer):
+    product_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProductType.objects.all(), source="product_type"
+    )
+    material_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=MaterialType.objects.all(), source="material_type"
+    )
+    min_partner_price = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        min_value=Decimal("0.00"),
+    )
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "article",
+            "name",
+            "min_partner_price",
+            "product_type_id",
+            "material_type_id",
+        ]
+
+    def validate_min_partner_price(self, value: Decimal) -> float:
+        rounded_value = value.quantize(Decimal("0.01"))
+        return float(rounded_value)

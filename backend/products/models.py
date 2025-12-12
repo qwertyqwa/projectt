@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ProductType(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     coefficient = models.FloatField(null=True, blank=True)
 
@@ -15,7 +15,7 @@ class ProductType(models.Model):
 
 
 class MaterialType(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     loss_percent = models.FloatField(null=True, blank=True)
 
@@ -28,7 +28,7 @@ class MaterialType(models.Model):
 
 
 class Workshop(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     workshop_type = models.CharField(max_length=255, null=True, blank=True)
     workers_count = models.IntegerField(null=True, blank=True)
@@ -42,7 +42,7 @@ class Workshop(models.Model):
 
 
 class Product(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     article = models.CharField(max_length=255, null=True, blank=True)
     min_partner_price = models.FloatField(null=True, blank=True)

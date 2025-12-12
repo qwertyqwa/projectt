@@ -10,6 +10,10 @@
 ## REST API
 - `GET /api/products` — список продукции с подсчитанным временем изготовления.
 - `GET /api/products/<id>` — карточка продукции с детализацией по цехам.
+- `POST /api/products` — добавить продукцию (поля: `article`, `name`, `min_partner_price`, `product_type_id`, `material_type_id`).
+- `PUT /api/products/<id>` — редактировать продукцию (те же поля).
+- `GET /api/product-types` — список типов продукции для выпадающего списка.
+- `GET /api/material-types` — список типов материалов для выпадающего списка.
 
 ## Расчет времени изготовления
 1. Для продукции суммируются значения `manufacture_hours` из таблицы `product_workshop`.
