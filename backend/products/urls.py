@@ -8,6 +8,8 @@ urlpatterns = [
     path("api/product-types", views.ProductTypeListView.as_view(), name="product-type-list"),
     path("api/material-types", views.MaterialTypeListView.as_view(), name="material-type-list"),
     path("api/products", views.ProductListCreateView.as_view(), name="product-list"),
-    path("api/products/<int:pk>", views.ProductRetrieveUpdateView.as_view(), name="product-detail"),
+    path("api/products/<int:pk>", views.ProductRetrieveUpdateDestroyView.as_view(), name="product-detail"),
     path("api/products/<int:pk>/workshops", views.ProductWorkshopsView.as_view(), name="product-workshops"),
+    path("api/workshops", views.WorkshopListCreateView.as_view(), name="workshop-list"),
+    path("api/workshops/<int:pk>", views.WorkshopRetrieveUpdateDestroyView.as_view(), name="workshop-detail"),
 ]

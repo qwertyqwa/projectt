@@ -2,9 +2,9 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
-import { fetch_products } from "../api/http";
+import { delete_product, fetch_products } from "../api/http";
 import type { ProductListItem } from "../api/types";
-import { show_alert } from "../lib/dialog";
+import { show_alert, show_confirm } from "../lib/dialog";
 
 const router = useRouter();
 
@@ -43,6 +43,31 @@ function open_edit(id: number) {
 
 function open_workshops(id: number) {
   router.push(`/products/${id}/workshops`);
+}
+
+async function remove_product(product: ProductListItem) {
+  const confirmed = await show_confirm(
+    "warning",
+    "Удаление продукции",
+    `Удалить продукт «${product.name}»?\nДействие необратимо.`,
+    "Удалить",
+    "Отмена"
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await delete_product(product.id);
+    await load_products();
+    show_alert("info", "Информация", "Продукция удалена.");
+  } catch (error) {
+    show_alert(
+      "error",
+      "Ошибка",
+      error instanceof Error ? error.message : "Не удалось удалить продукцию."
+    );
+  }
 }
 
 onMounted(() => {
@@ -96,6 +121,13 @@ onMounted(() => {
                 @click.stop="open_edit(product.id)"
               >
                 Редактировать
+              </button>
+              <button
+                class="btn btn-danger"
+                type="button"
+                @click.stop="remove_product(product)"
+              >
+                Удалить
               </button>
             </div>
           </div>

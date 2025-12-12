@@ -19,6 +19,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "products",
+    "company_partners",
+    "company_warehouse",
+    "company_staff",
 ]
 
 MIDDLEWARE = [
@@ -52,10 +55,18 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
+db_path_env = os.environ.get("DJANGO_DB_PATH")
+if db_path_env:
+    db_path = Path(db_path_env)
+    if not db_path.is_absolute():
+        db_path = PROJECT_ROOT / db_path
+else:
+    db_path = PROJECT_ROOT / "furniture.db"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": PROJECT_ROOT / "furniture.db",
+        "NAME": str(db_path),
     }
 }
 

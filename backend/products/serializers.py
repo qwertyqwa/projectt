@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from .models import MaterialType, Product, ProductType, ProductWorkshop
+from .models import MaterialType, Product, ProductType, ProductWorkshop, Workshop
 
 
 def rounded_hours(raw_value: float | None) -> int:
@@ -97,3 +97,11 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     def validate_min_partner_price(self, value: Decimal) -> float:
         rounded_value = value.quantize(Decimal("0.01"))
         return float(rounded_value)
+
+
+class WorkshopSerializer(serializers.ModelSerializer):
+    workers_count = serializers.IntegerField(min_value=0, required=False, allow_null=True)
+
+    class Meta:
+        model = Workshop
+        fields = ["id", "name", "workshop_type", "workers_count"]

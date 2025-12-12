@@ -1,10 +1,24 @@
+import os
 import sqlite3
 from pathlib import Path
 
 import pandas as pd
 
-DB_NAME = "furniture.db"
-DATA_DIR = Path(".")  # папка, где лежат файлы *_import.xlsx
+BASE_DIR = Path(__file__).resolve().parent
+
+
+def resolve_db_path() -> Path:
+    db_env = os.environ.get("DJANGO_DB_PATH")
+    if db_env:
+        db_path = Path(db_env)
+        if not db_path.is_absolute():
+            db_path = BASE_DIR / db_path
+        return db_path
+    return BASE_DIR / "furniture.db"
+
+
+DB_PATH = resolve_db_path()
+DATA_DIR = BASE_DIR  # папка, где лежат файлы *_import.xlsx
 
 FILE_PRODUCTS = DATA_DIR / "Products_import.xlsx"
 FILE_PRODUCT_TYPES = DATA_DIR / "Product_type_import.xlsx"
@@ -219,14 +233,25 @@ def load_product_workshops(conn: sqlite3.Connection) -> None:
 
 
 def main():
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(str(DB_PATH))
     try:
-        create_tables(conn)
-        load_product_types(conn)
-        load_material_types(conn)
-        load_workshops(conn)
-        load_products(conn)
-        load_product_workshops(conn)
+        try:
+            create_tables(conn)
+            load_product_types(conn)
+            load_material_types(conn)
+            load_workshops(conn)
+            load_products(conn)
+            load_product_workshops(conn)
+        except FileNotFoundError as exc:
+            raise SystemExit(
+                f"Не найден файл импорта: {exc.filename}. "
+                "Проверьте, что рядом с import.py лежат файлы *_import.xlsx."
+            ) from exc
+        except ImportError as exc:
+            raise SystemExit(
+                "Не установлены зависимости для импорта из Excel. "
+                "Установите зависимости командой: pip install -r backend/requirements.txt"
+            ) from exc
     finally:
         conn.close()
 

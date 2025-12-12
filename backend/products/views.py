@@ -9,13 +9,14 @@ from rest_framework.response import Response
 
 from raw_material_calculation import calculate_raw_material_amount
 
-from .models import MaterialType, Product, ProductType, ProductWorkshop
+from .models import MaterialType, Product, ProductType, ProductWorkshop, Workshop
 from .serializers import (
     MaterialTypeSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
     ProductTypeSerializer,
     ProductWriteSerializer,
+    WorkshopSerializer,
     WorkshopTimeSerializer,
 )
 
@@ -57,7 +58,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
             )
 
 
-class ProductRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+class ProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = _base_queryset()
 
     def get_serializer_class(self):
@@ -78,6 +79,11 @@ class ProductRetrieveUpdateView(generics.RetrieveUpdateAPIView):
                     )
                 }
             )
+
+    def perform_destroy(self, instance: Product):
+        with transaction.atomic():
+            ProductWorkshop.objects.filter(product_id=instance.id).delete()
+            instance.delete()
 
 
 class ProductTypeListView(generics.ListAPIView):
@@ -101,6 +107,48 @@ class ProductWorkshopsView(generics.ListAPIView):
             .order_by("workshop__name")
         )
 
+
+class WorkshopListCreateView(generics.ListCreateAPIView):
+    serializer_class = WorkshopSerializer
+    queryset = Workshop.objects.order_by("name")
+
+    def perform_create(self, serializer):
+        try:
+            with transaction.atomic():
+                serializer.save()
+        except IntegrityError:
+            raise ValidationError(
+                {
+                    "name": (
+                        "Цех с таким названием уже существует. "
+                        "Введите другое название."
+                    )
+                }
+            )
+
+
+class WorkshopRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = WorkshopSerializer
+    queryset = Workshop.objects.all()
+
+    def perform_update(self, serializer):
+        try:
+            with transaction.atomic():
+                serializer.save()
+        except IntegrityError:
+            raise ValidationError(
+                {
+                    "name": (
+                        "Цех с таким названием уже существует. "
+                        "Введите другое название."
+                    )
+                }
+            )
+
+    def perform_destroy(self, instance: Workshop):
+        with transaction.atomic():
+            ProductWorkshop.objects.filter(workshop_id=instance.id).delete()
+            instance.delete()
 
 @api_view(["GET"])
 def health(request):
