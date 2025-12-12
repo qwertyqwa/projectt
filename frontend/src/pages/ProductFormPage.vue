@@ -178,6 +178,7 @@ async function save() {
     } else {
       await create_product(payload);
     }
+    initial_snapshot.value = snapshot();
     show_alert(
       "success",
       "Информация",
@@ -354,4 +355,3 @@ onMounted(() => {
   grid-column: 1 / -1;
 }
 </style>
-
