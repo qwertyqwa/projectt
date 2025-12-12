@@ -2,6 +2,8 @@ import type {
   LookupItem,
   ProductDetail,
   ProductListItem,
+  RawMaterialCalcPayload,
+  RawMaterialCalcResponse,
   ProductWritePayload,
 } from "./types";
 
@@ -98,6 +100,14 @@ export function create_product(payload: ProductWritePayload) {
 export function update_product(id: number, payload: ProductWritePayload) {
   return request_json<ProductDetail>(`/api/products/${id}`, {
     method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function calculate_raw_material(payload: RawMaterialCalcPayload) {
+  return request_json<RawMaterialCalcResponse>("/api/raw-material/calculate", {
+    method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(payload),
   });

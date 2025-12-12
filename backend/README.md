@@ -14,6 +14,8 @@
 - `PUT /api/products/<id>` — редактировать продукцию (те же поля).
 - `GET /api/product-types` — список типов продукции для выпадающего списка.
 - `GET /api/material-types` — список типов материалов для выпадающего списка.
+- `GET /api/products/<id>/workshops` — список цехов для производства продукции.
+- `POST /api/raw-material/calculate` — расчет количества сырья (возвращает `raw_material_amount`, при ошибке `-1`).
 
 ## Расчет времени изготовления
 1. Для продукции суммируются значения `manufacture_hours` из таблицы `product_workshop`.

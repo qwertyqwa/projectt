@@ -246,6 +246,13 @@ onMounted(() => {
         <button class="btn btn-secondary" type="button" @click="go_back">
           Назад
         </button>
+        <RouterLink
+          v-if="is_edit && product_id"
+          class="btn btn-secondary"
+          :to="`/products/${product_id}/workshops`"
+        >
+          Цеха
+        </RouterLink>
         <button class="btn btn-primary" type="button" :disabled="saving" @click="save">
           {{ saving ? "Сохранение..." : "Сохранить" }}
         </button>

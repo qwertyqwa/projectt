@@ -41,6 +41,10 @@ function open_edit(id: number) {
   router.push(`/products/${id}`);
 }
 
+function open_workshops(id: number) {
+  router.push(`/products/${id}/workshops`);
+}
+
 onMounted(() => {
   load_products();
 });
@@ -78,13 +82,22 @@ onMounted(() => {
             <div class="product-title">
               {{ product.product_type }} | {{ product.name }}
             </div>
-            <button
-              class="btn btn-secondary"
-              type="button"
-              @click.stop="open_edit(product.id)"
-            >
-              Редактировать
-            </button>
+            <div class="product-actions">
+              <button
+                class="btn btn-secondary"
+                type="button"
+                @click.stop="open_workshops(product.id)"
+              >
+                Цеха
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="button"
+                @click.stop="open_edit(product.id)"
+              >
+                Редактировать
+              </button>
+            </div>
           </div>
 
           <div class="product-meta">
@@ -136,6 +149,12 @@ onMounted(() => {
   gap: 12px;
 }
 
+.product-actions {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
 .product-title {
   font-size: 16px;
   font-weight: 900;
@@ -177,4 +196,3 @@ onMounted(() => {
   color: var(--color-accent);
 }
 </style>
-

@@ -17,6 +17,7 @@ export type ProductListItem = {
 
 export type WorkshopTime = {
   workshop: string;
+  workers_count: number | null;
   manufacture_hours: number | null;
 };
 
@@ -32,3 +33,14 @@ export type ProductWritePayload = {
   material_type_id: number;
 };
 
+export type RawMaterialCalcPayload = {
+  product_type_id: number;
+  material_type_id: number;
+  product_quantity: number;
+  parameter_one: number;
+  parameter_two: number;
+};
+
+export type RawMaterialCalcResponse = {
+  raw_material_amount: number;
+};

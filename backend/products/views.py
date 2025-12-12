@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.db.models import FloatField, Sum, Value
 from django.db.models.functions import Coalesce
@@ -6,13 +7,16 @@ from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .models import MaterialType, Product, ProductType
+from raw_material_calculation import calculate_raw_material_amount
+
+from .models import MaterialType, Product, ProductType, ProductWorkshop
 from .serializers import (
     MaterialTypeSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
     ProductTypeSerializer,
     ProductWriteSerializer,
+    WorkshopTimeSerializer,
 )
 
 
@@ -86,6 +90,32 @@ class MaterialTypeListView(generics.ListAPIView):
     queryset = MaterialType.objects.order_by("name")
 
 
+class ProductWorkshopsView(generics.ListAPIView):
+    serializer_class = WorkshopTimeSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs.get("pk")
+        return (
+            ProductWorkshop.objects.select_related("workshop")
+            .filter(product_id=product_id)
+            .order_by("workshop__name")
+        )
+
+
 @api_view(["GET"])
 def health(request):
     return Response({"status": "ok"})
+
+
+@api_view(["POST"])
+def raw_material_calculate(request):
+    data = request.data if isinstance(request.data, dict) else {}
+    amount = calculate_raw_material_amount(
+        data.get("product_type_id"),
+        data.get("material_type_id"),
+        data.get("product_quantity"),
+        data.get("parameter_one"),
+        data.get("parameter_two"),
+        db_path=settings.DATABASES["default"]["NAME"],
+    )
+    return Response({"raw_material_amount": amount})

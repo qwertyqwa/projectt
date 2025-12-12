@@ -44,10 +44,11 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class WorkshopTimeSerializer(serializers.ModelSerializer):
     workshop = serializers.CharField(source="workshop.name")
+    workers_count = serializers.IntegerField(source="workshop.workers_count")
 
     class Meta:
         model = ProductWorkshop
-        fields = ["workshop", "manufacture_hours"]
+        fields = ["workshop", "workers_count", "manufacture_hours"]
 
 
 class ProductDetailSerializer(ProductListSerializer):
